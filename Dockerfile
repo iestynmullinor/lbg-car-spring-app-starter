@@ -1,18 +1,14 @@
-FROM node:19-alpine as build
+# Use an official OpenJDK base image from Docker Hub
+FROM openjdk:17-jdk-alpine
 
-# change into a folder called /app
+# Set the working directory inside the container
 WORKDIR /app
 
-# only copy package.json
-COPY package.json .
+# Copy the Spring Boot JAR file into the container
+COPY target/my-spring-boot-app.jar /app/my-spring-boot-app.jar
 
-# download the project dependencies
-RUN npm install
+# Expose the port your application runs on
+EXPOSE 8080
 
-# copy everything from the react app folder to the /app folder in the container
-COPY . .
-
-# package up the react project in the /app directory
-RUN npm run build
-
-CMD ["npm", "run", "start"]
+# Define the command to run your Spring Boot application
+CMD ["java", "-jar", "/app/my-spring-boot-app.jar"]
