@@ -1,14 +1,17 @@
-# Use an official OpenJDK base image from Docker Hub
-FROM openjdk:17-jdk-alpine
+FROM maven:latest AS build
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the Spring Boot JAR file into the container
-COPY target/my-spring-boot-app.jar /app/my-spring-boot-app.jar
+COPY . .
 
-# Expose the port your application runs on
-EXPOSE 8080
+RUN mvn clean package -Dmaven.test.skip
 
-# Define the command to run your Spring Boot application
-CMD ["java", "-jar", "/app/my-spring-boot-app.jar"]
+FROM openjdk:17-jdk-slim
+
+COPY --from=build /app/target/cardatabase-0.0.1-SNAPSHOT.jar /app/cardatabase.jar
+
+WORKDIR /app
+
+EXPOSE 8000
+
+CMD ["java", "-jar", "/app/cardatabase.jar"]
